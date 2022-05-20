@@ -38,9 +38,20 @@ services:
 #    ports:
 #      - "8081:8978"
 #    volumes:
-#      - dbeaver-data:/var/cloudbeaver/workspace
+#      - dbeaver-data:/var/cloudbeaver/workspace 
+
+ redis:
+   container_name: redis_container
+   image: redis:7.0-rc2
+   restart: always
+   ports:
+     - "6379:6379"
+
+   volumes:
+     - redis-data:/var/lib/redis
 
 volumes:
  db-data:
  pgadmin-data:
+ redis-data:
 #  dbeaver-data:

@@ -17,19 +17,8 @@ export default {
   user: 'abdullah',
   allowGlobalContext: true,
 } as Parameters<typeof MikroORM.init>[0];
-// type x = Re<typeof MikroORM.init>
-/* 
 
- TODO: How to login as user in postgres sell
-* psql -U postgres
- TODO: How to create user in postgres
-* createuser <username>
- TODO: How to create db in postgres
-* createdb <dbname>
-* alter user <username> with encrypted password '<set your password>'
-* grant all privileges on database <databasename> to <username>
-
-
+/*
 https://hevodata.com/learn/pgadmin-docker/
 */
 
