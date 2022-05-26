@@ -4,8 +4,8 @@ import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import microConfig from "./mikro-orm.config";
 import express from 'express';
-// import https from 'https';
-// import fs from 'fs';
+import https from 'https';
+import fs from 'fs';
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
@@ -17,13 +17,15 @@ import connectRedis from "connect-redis"
 
 import { MyContext } from "./types";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-
-// console.log(process.cwd())
+import path from "path";
+import cors from "cors";
 
 const main = async () => {
   const orm = await MikroORM.init(microConfig);
   await orm.getMigrator().up();
   const app = express();
+
+
 
   app.set("trust proxy", true);
 
@@ -38,7 +40,12 @@ const main = async () => {
 
   await redisClient.connect();
 
-
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true
+    })
+  )
 
   app.use(
     session({
@@ -60,30 +67,34 @@ const main = async () => {
   // const Cors = cors({
   //   credentials: true,
   //   origin: ['https://studio.apollographql.com']
-  // })
+  // }) 
 
-  // const httpsServer = https.createServer({
-  //   key: fs.readFileSync(path.join(__dirname, 'server.key'), 'utf-8'),
-  //   cert: fs.readFileSync(path.join(__dirname, 'server.cert'), 'utf-8')
-  // }, app)
+  const httpsServer = https.createServer({
+    key: fs.readFileSync(path.join(__dirname, 'server.key'), 'utf-8'),
+    cert: fs.readFileSync(path.join(__dirname, 'server.cert'), 'utf-8')
+  }, app)
 
   const apolloServer = new ApolloServer({
-    
-    plugins: [ ApolloServerPluginLandingPageGraphQLPlayground({
+
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground({
       // options
-      
+
     })],
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ res, req }): MyContext => ({ em: orm.em, res, req }) 
+    context: ({ res, req }): MyContext => {
+      return { em: orm.em, res, req }
+    }
   })
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(4000, () => {
+
+
+  httpsServer.listen(4000, () => {
     console.log('server started')
   })
 

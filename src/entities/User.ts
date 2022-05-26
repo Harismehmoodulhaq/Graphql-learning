@@ -25,5 +25,5 @@ export class User {
 
     @Field()
     @Property({ type: "text" })
-    gender: string;
+    gender: string; 
 }
