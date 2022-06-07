@@ -2,6 +2,7 @@ import { User } from "../entities/User";
 import { MyContext } from "src/types";
 import { Resolver, Mutation, InputType, Field, Arg, Ctx, ObjectType, Query } from "type-graphql";
 import argon2 from "argon2";
+import { COOKIE_NAME } from "../constants";
 // import { session, SessionData } from "express-session";
 
 @InputType()
@@ -15,7 +16,7 @@ class LoginParams {
 @InputType()
 class RegisterParams extends LoginParams {
     @Field()
-    gender?: string
+    gender: string
 }
 
 
@@ -81,6 +82,14 @@ export class UserResolver {
                 }]
             }
         }
+        if (register.gender.length <= 3) {
+            return {
+                errors: [{
+                    field: "gender",
+                    message: "Please enter your gender"
+                }]
+            }
+        }
 
         const hashedPassword = await argon2.hash(register.password)
         const user = em.create(User, { username: register.username, gender: register.gender as string, password: hashedPassword as string } as User);
@@ -143,6 +152,20 @@ export class UserResolver {
             user,
         };
 
+    }
+
+    @Mutation(() => Boolean)
+    logout(
+        @Ctx() {req, res}: MyContext
+    ) {
+        return new Promise((resolver) => req.session.destroy((err) => {
+            res.clearCookie(COOKIE_NAME)
+            if(err) {
+                resolver(false)
+                return
+            }
+            resolver(true)
+        }))
     }
 }
 

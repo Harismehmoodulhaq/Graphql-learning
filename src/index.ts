@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import microConfig from "./mikro-orm.config";
 import express from 'express';
-import https from 'https';
-import fs from 'fs';
+// import https from 'https';
+// import fs from 'fs';
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
@@ -17,7 +17,7 @@ import connectRedis from "connect-redis"
 
 import { MyContext } from "./types";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import path from "path";
+// import path from "path";
 import cors from "cors";
 
 const main = async () => {
@@ -49,7 +49,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: "qid",
+      name: COOKIE_NAME,
       store: new RedisStore({ client: redisClient, disableTouch: true, disableTTL: true }),
       secret: "keyboard cat",
       resave: false,
@@ -69,10 +69,10 @@ const main = async () => {
   //   origin: ['https://studio.apollographql.com']
   // }) 
 
-  const httpsServer = https.createServer({
-    key: fs.readFileSync(path.join(__dirname, 'server.key'), 'utf-8'),
-    cert: fs.readFileSync(path.join(__dirname, 'server.cert'), 'utf-8')
-  }, app)
+  // const httpsServer = https.createServer({
+  //   key: fs.readFileSync(path.join(__dirname, 'server.key'), 'utf-8'),
+  //   cert: fs.readFileSync(path.join(__dirname, 'server.cert'), 'utf-8')
+  // }, app)
 
   const apolloServer = new ApolloServer({
 
@@ -94,7 +94,7 @@ const main = async () => {
 
 
 
-  httpsServer.listen(4000, () => {
+  app.listen(4000, () => {
     console.log('server started')
   })
 
