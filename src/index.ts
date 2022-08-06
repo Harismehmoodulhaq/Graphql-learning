@@ -1,27 +1,30 @@
-import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
+import express from 'express';
+import "reflect-metadata";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import microConfig from "./mikro-orm.config";
-import express from 'express';
 // import https from 'https';
 // import fs from 'fs';
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer } from 'apollo-server-express';
+import connectRedis from "connect-redis";
+import session from "express-session";
+import { createClient } from "redis";
+import Redis from "ioredis"
 import { buildSchema } from "type-graphql";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
-import { createClient } from "redis";
-import session from "express-session";
-import connectRedis from "connect-redis"
 
-import { MyContext } from "./types";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import { MyContext } from "./types";
 // import path from "path";
 import cors from "cors";
+// import { User } from "./entities/User";
 
 const main = async () => {
   const orm = await MikroORM.init(microConfig);
+  // await orm.em.nativeDelete(User, {})
   await orm.getMigrator().up();
   const app = express();
 
@@ -36,6 +39,7 @@ const main = async () => {
   const redisClient = createClient({
     url: 'redis://127.0.0.1', legacyMode: true,
   })
+  const redis = new Redis();
 
 
   await redisClient.connect();
@@ -85,7 +89,7 @@ const main = async () => {
       validate: false,
     }),
     context: ({ res, req }): MyContext => {
-      return { em: orm.em, res, req }
+      return { em: orm.em, res, req, redis }
     }
   })
 
