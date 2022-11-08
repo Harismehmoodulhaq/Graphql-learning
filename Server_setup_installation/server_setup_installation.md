@@ -12,3 +12,7 @@
 # Fourth Setup
     yarn watch
     yarn dev
+# Fifth Setup install TypeORM
+    yarn add typeorm
+
+<!-- Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -->

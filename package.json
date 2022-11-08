@@ -18,13 +18,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mikro-orm/cli": "^5.5.0",
-    "@mikro-orm/core": "^5.5.0",
-    "@mikro-orm/migrations": "^5.5.0",
-    "@mikro-orm/postgresql": "^5.5.0",
     "@types/cors": "^2.8.12",
     "@types/ioredis": "^4.28.10",
-    "@types/node": "^18.11.8",
+    "@types/node": "^18.11.9",
     "@types/nodemailer": "^6.4.4",
     "@types/uuid": "^8.3.4",
     "apollo-server-core": "^3.7.0",
@@ -42,7 +38,7 @@
     "redis": "^4.1.0",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
-    "typeorm": "^0.3.6",
+    "typeorm": "^0.2.45",
     "typescript": "^4.8.4",
     "uuid": "^9.0.0",
     "yarn": "^1.22.18"

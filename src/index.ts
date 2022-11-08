@@ -1,31 +1,41 @@
-import { MikroORM } from "@mikro-orm/core";
-import express from 'express';
-import "reflect-metadata";
-import { COOKIE_NAME, __prod__ } from "./constants";
-import { Post } from "./entities/Post";
-import microConfig from "./mikro-orm.config";
-// import https from 'https';
-// import fs from 'fs';
 import { ApolloServer } from 'apollo-server-express';
 import connectRedis from "connect-redis";
+import express from 'express';
 import session from "express-session";
+import Redis from "ioredis";
 import { createClient } from "redis";
-import Redis from "ioredis"
+import "reflect-metadata";
 import { buildSchema } from "type-graphql";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { MyContext } from "./types";
+
 // import path from "path";
 import cors from "cors";
-// import { User } from "./entities/User";
+import { createConnection } from 'typeorm';
+import { Post } from './entities/Post';
+import { User } from './entities/User';
 
 const main = async () => {
-  const orm = await MikroORM.init(microConfig);
-  // await orm.em.nativeDelete(User, {})
-  await orm.getMigrator().up();
+
+  const conn = await createConnection({
+    type: 'postgres',
+    host: 'localhost',
+    port: 4999,
+    database: 'lireddit2',
+    username: 'abdullah',
+    password: 'haris123',
+    logging: true,
+    synchronize: true,
+    entities: [
+      Post, User
+    ]
+
+  })
+
   const app = express();
 
 
@@ -88,9 +98,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ res, req }): MyContext => {
-      return { em: orm.em, res, req, redis }
-    }
+    context: ({ res, req }) => ({ req, res, redis })
   })
 
   await apolloServer.start();
@@ -105,8 +113,8 @@ const main = async () => {
   // const post = orm.em.create(Post, {title: 'my first post'} as Post);
   // await orm.em.persistAndFlush(post);
 
-  const posts = await orm.em.find(Post, {});
-  console.log(posts);
+  // const posts = await orm.em.find(Post, {});
+  // console.log(posts);
 };
 
 main().catch(err => {
